@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PubNub JavaScript SDK QuickStart</title>
+  <style>
+    #foobar {
+      text-align: center;
+      font-size: 24px;
+    }
+    #messageID {
+        text-align: center;
+        font-size: 20;
+        color: burlywood;
+    }
+  </style>
+</head>
+
+<body >
+<div id = "foobar">
+  <strong>Message:</strong> <input id="update-text" type="input" placeholder="enter some text"/>
+  <input id="publish-button" type="submit" value="Submit"/>
+  <p><strong>Real time updates</strong></p>
+  <div id="messages-top"/>
+</div>
+</body>
+
+<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.27.4.min.js"></script>
+
+<script>
+  const messagesTop = document.getElementById('messages-top');
+  const updateText = document.getElementById('update-text');
+  const sendButton = document.getElementById('publish-button');
+  sendButton.addEventListener('click', () => {submitUpdate(theEntry, updateText.value)});
+
+  const clientUUID = PubNub.generateUUID();
+  const theChannel = 'the_guide';
+  const theEntry = 'your message';
+
+  const pubnub = new PubNub({
+
+    publishKey: 'pub-c-e7d52b42-3674-4dac-8497-eaf6d2f961a0',
+    subscribeKey: 'sub-c-e042d526-f3ec-11ea-a5ac-ca9fd24ed40e',
+    uuid: clientUUID
+  });
+
+  pubnub.addListener({
+    message: function(event) {
+      displayMessage('What I heard',
+        event.message.entry + ': ' + event.message.update);
+    }
+  });
+
+  pubnub.subscribe({
+    channels: ['the_guide'],
+    withPresence: true
+  });
+
+  submitUpdate = function(anEntry, anUpdate) {
+    pubnub.publish({
+      channel : theChannel,
+      message : {'entry' : anEntry, 'update' : anUpdate}
+    });
+
+    displayMessage('[PUBLISH: sent]',
+          'timetoken: ' + response.timetoken);
+   };
+
+
+    displayMessage = function(messageType, aMessage) {
+    let pmessage = document.createElement('p');
+    let br = document.createElement('br');
+
+    messagesTop.after(pmessage);
+    pmessage.appendChild(document.createTextNode(messageType));
+    pmessage.appendChild(br);
+    pmessage.appendChild(document.createTextNode(aMessage));
+
+    updateText.value="";
+  }
+
+
+</script>
+</html>
